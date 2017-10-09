@@ -1,0 +1,51 @@
+---
+title: "STAT/MATH 495: Problem Set 06"
+author: "WRITE YOUR NAME HERE"
+date: "2017-10-17"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 2
+    collapsed: false
+    smooth_scroll: false
+    df_print: kable
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE, fig.width=8, fig.height=4.5, message=FALSE, warning = FALSE
+  )
+set.seed(76)
+
+# Load packages
+library(tidyverse)
+```
+
+
+# Collaboration
+
+Please indicate who you collaborated with on this assignment:
+
+
+# Exploratory Data Analysis
+
+
+```{r}
+
+```
+
+
+# Model Fit
+
+```{r}
+
+```
+
+
+# Create Submission File
+
+```{r}
+
+```
