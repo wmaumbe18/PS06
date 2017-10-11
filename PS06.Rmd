@@ -84,7 +84,7 @@ generate_sample <- function(f, n_sim, sigma) {
 Number of simulations
 
 ```{r}
-n_sim <- 100000
+n_sim <- 10000
 ```
 
 
