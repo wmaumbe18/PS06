@@ -12,7 +12,6 @@ output:
     df_print: kable
 ---
 
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   echo = TRUE, fig.width=8, fig.height=4.5, message=FALSE, warning = FALSE
@@ -21,31 +20,118 @@ set.seed(76)
 
 # Load packages
 library(tidyverse)
+library(broom)
+library(knitr)
 ```
+
+
+
 
 
 # Collaboration
 
-Please indicate who you collaborated with on this assignment:
+Please indicate who you collaborated with on this assignment: 
 
 
-# Exploratory Data Analysis
 
+
+
+# Setup
+
+Define truth, which again we know for the purposes of this assignment, but in
+practice we won't:
+
+* the true function f(x) i.e. the signal
+* the true epsilon i.e. the noise, which in this case
+is Normal$(0, sd=\sigma)$. Hence the standard deviation $\sigma$ determines the noise.
+
+```{r}
+f <- function(x) {
+  x^2
+}
+sigma <- 0.3
+```
+
+This is the target point we'll be trying to predict: $(0.95, f(0.95)) = (0.95, 0.95^2) = (0.95, 0.9025)$, Thus, the test set is just `x=0.95`
+
+```{r}
+x0 <- 0.95
+test_set <- data_frame(x=x0)
+```
+
+This function generates a random sample; think of this as a "get new data"
+function. Random in terms of both:
+
+* (New) the predictor x (uniform on [0,1])
+* the amount of noise $\epsilon$
+
+```{r}
+generate_sample <- function(f, n_sim, sigma) {
+  sample <- data_frame(
+    x = runif(n = n_sim, min = 0, max = 1),
+    f_x = f(x),
+    epsilon = rnorm(n = n_sim, mean = 0, sd = sigma),
+    y = f_x + epsilon
+  )
+  # Recall: We don't observe f(x) and epsilon, just (x, y)
+  sample <- sample %>% 
+    select(x, y)
+  
+  return(sample)
+}
+```
+
+Number of simulations
+
+```{r}
+n_sim <- 100000
+```
+
+
+# Computation
 
 ```{r}
 
 ```
 
 
-# Model Fit
+# Tables
+
+As done in Lec 2.7, for both
+
+* An `lm` regression
+* A `smooth.splines(x, y, df=99)` model fit 
+
+output tables comparing:
+
+* The mean square error
+* The breakdown of
+    + Irreducible error component
+    + Bias component
+    + Variance component
+* The sum of the breakdown above: 
+
+$$
+\mbox{Var}\left[\widehat{f}(x_0)\right] +
+\left(\mbox{Bias}\left[\widehat{f}(x_0)\right]\right)^2 + \sigma^2 \approx \mbox{MSE}\left[\widehat{f}(x_0)\right]
+$$
+
+What I got when running my simulations for `n_sim = 10000`:
+
+* `lm`: `MSE = 0.105` and `sum = 0.108`
+* `smooth.splines(df=99)`: `MSE = 17.839` and `sum = 17.851`
+
+
+Please output tables using the `kable(digits=3)` function like below:
 
 ```{r}
-
+mtcars %>% 
+  head() %>% 
+  kable(digits = 3)
 ```
 
 
-# Create Submission File
+# Overall breakdown
 
-```{r}
-
-```
+In **two** sentences or less, give a rough sketch of what the procedure would be 
+to get the breakdown of $$\mbox{MSE}\left[\widehat{f}(x)\right]$$ for *all* $x$ in this example, and not just for $$\mbox{MSE}\left[\widehat{f}(x_0)\right] = \mbox{MSE}\left[\widehat{f}(0.95)\right]$$. 
