@@ -42,8 +42,8 @@ Define truth, which again we know for the purposes of this assignment, but in
 practice we won't:
 
 * the true function f(x) i.e. the signal
-* the true epsilon i.e. the noise, which in this case
-is Normal$(0, sd=\sigma)$. Hence the standard deviation $\sigma$ determines the noise.
+* the true epsilon i.e. the noise, which in this case is Normal$(0, sd=\sigma)$.
+Hence the standard deviation $\sigma$ determines the amount of noise.
 
 ```{r}
 f <- function(x) {
@@ -59,18 +59,18 @@ x0 <- 0.95
 test_set <- data_frame(x=x0)
 ```
 
-This function generates a random sample; think of this as a "get new data"
-function. Random in terms of both:
+This function generates a random sample of size $n$; think of this as a "get new
+data" function. Random in terms of both:
 
 * (New) the predictor x (uniform on [0,1])
 * the amount of noise $\epsilon$
 
 ```{r}
-generate_sample <- function(f, n_sim, sigma) {
+generate_sample <- function(f, n, sigma) {
   sample <- data_frame(
-    x = runif(n = n_sim, min = 0, max = 1),
+    x = runif(n = n, min = 0, max = 1),
     f_x = f(x),
-    epsilon = rnorm(n = n_sim, mean = 0, sd = sigma),
+    epsilon = rnorm(n = n, mean = 0, sd = sigma),
     y = f_x + epsilon
   )
   # Recall: We don't observe f(x) and epsilon, just (x, y)
@@ -81,10 +81,15 @@ generate_sample <- function(f, n_sim, sigma) {
 }
 ```
 
-Number of simulations
+Define
+
+* The number $n$ of observations $(x_i, y_i)$ in each sample. In the handout,
+$n=100$ to keep plots uncrowded. Here we boost to $n=500$
+* Number of samples of size $n$ to consider
 
 ```{r}
-n_sim <- 10000
+n <- 500
+n_sample <- 10000
 ```
 
 
@@ -99,39 +104,33 @@ n_sim <- 10000
 
 As done in Lec 2.7, for both
 
-* An `lm` regression
+* An `lm` regression AKA a `smooth.splines(x, y, df=2)` model fit 
 * A `smooth.splines(x, y, df=99)` model fit 
 
 output tables comparing:
 
-* The mean square error
-* The breakdown of
-    + Irreducible error component
-    + Bias component
-    + Variance component
-* The sum of the breakdown above: 
+|  MSE| bias_squared|   var| irreducible|   sum|
+|----:|------------:|-----:|-----------:|-----:|
+|     X|           X  |     X |      X |         X |
 
-$$
-\mbox{Var}\left[\widehat{f}(x_0)\right] +
-\left(\mbox{Bias}\left[\widehat{f}(x_0)\right]\right)^2 + \sigma^2 \approx \mbox{MSE}\left[\widehat{f}(x_0)\right]
-$$
-
-What I got when running my simulations for `n_sim = 10000`:
-
-* `lm`: `MSE = 0.105` and `sum = 0.108`
-* `smooth.splines(df=99)`: `MSE = 17.839` and `sum = 17.851`
+where `sum = bias_squared + var + irreducible`. You can created cleanly formatted tables like the one above by piping a data frame into `knitr::kable(digits=4)`.
 
 
-Please output tables using the `kable(digits=3)` function like below:
-
-```{r}
-mtcars %>% 
-  head() %>% 
-  kable(digits = 3)
-```
 
 
-# Overall breakdown
+# Analysis
 
-In **two** sentences or less, give a rough sketch of what the procedure would be 
-to get the breakdown of $$\mbox{MSE}\left[\widehat{f}(x)\right]$$ for *all* $x$ in this example, and not just for $$\mbox{MSE}\left[\widehat{f}(x_0)\right] = \mbox{MSE}\left[\widehat{f}(0.95)\right]$$. 
+**Questions**:
+
+1. Based on the topics covered in Lec 2.7, name one possible "sanity check" for your results. Name another if you can.
+1. In **two** sentences or less, give a rough sketch of what the procedure would
+be to get the breakdown of $$\mbox{MSE}\left[\widehat{f}(x)\right]$$ for *all*
+$x$ in this example, and not just for $$\mbox{MSE}\left[\widehat{f}(x_0)\right]
+= \mbox{MSE}\left[\widehat{f}(0.95)\right]$$.
+1. Which of the two models would you choose for predicting the point of interest and why?
+
+**Answers**:
+
+1.
+1.
+1.

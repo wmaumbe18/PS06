@@ -231,7 +231,7 @@ div.tocify {
 <p>Define truth, which again we know for the purposes of this assignment, but in practice we won’t:</p>
 <ul>
 <li>the true function f(x) i.e. the signal</li>
-<li>the true epsilon i.e. the noise, which in this case is Normal<span class="math inline">\((0, sd=\sigma)\)</span>. Hence the standard deviation <span class="math inline">\(\sigma\)</span> determines the noise.</li>
+<li>the true epsilon i.e. the noise, which in this case is Normal<span class="math inline">\((0, sd=\sigma)\)</span>. Hence the standard deviation <span class="math inline">\(\sigma\)</span> determines the amount of noise.</li>
 </ul>
 <pre class="r"><code>f &lt;- function(x) {
   x^2
@@ -240,16 +240,16 @@ sigma &lt;- 0.3</code></pre>
 <p>This is the target point we’ll be trying to predict: <span class="math inline">\((0.95, f(0.95)) = (0.95, 0.95^2) = (0.95, 0.9025)\)</span>, Thus, the test set is just <code>x=0.95</code></p>
 <pre class="r"><code>x0 &lt;- 0.95
 test_set &lt;- data_frame(x=x0)</code></pre>
-<p>This function generates a random sample; think of this as a “get new data” function. Random in terms of both:</p>
+<p>This function generates a random sample of size <span class="math inline">\(n\)</span>; think of this as a “get new data” function. Random in terms of both:</p>
 <ul>
 <li>(New) the predictor x (uniform on [0,1])</li>
 <li>the amount of noise <span class="math inline">\(\epsilon\)</span></li>
 </ul>
-<pre class="r"><code>generate_sample &lt;- function(f, n_sim, sigma) {
+<pre class="r"><code>generate_sample &lt;- function(f, n, sigma) {
   sample &lt;- data_frame(
-    x = runif(n = n_sim, min = 0, max = 1),
+    x = runif(n = n, min = 0, max = 1),
     f_x = f(x),
-    epsilon = rnorm(n = n_sim, mean = 0, sd = sigma),
+    epsilon = rnorm(n = n, mean = 0, sd = sigma),
     y = f_x + epsilon
   )
   # Recall: We don't observe f(x) and epsilon, just (x, y)
@@ -258,8 +258,13 @@ test_set &lt;- data_frame(x=x0)</code></pre>
   
   return(sample)
 }</code></pre>
-<p>Number of simulations</p>
-<pre class="r"><code>n_sim &lt;- 100000</code></pre>
+<p>Define</p>
+<ul>
+<li>The number <span class="math inline">\(n\)</span> of observations <span class="math inline">\((x_i, y_i)\)</span> in each sample. In the handout, <span class="math inline">\(n=100\)</span> to keep plots uncrowded. Here we boost to <span class="math inline">\(n=500\)</span></li>
+<li>Number of samples of size <span class="math inline">\(n\)</span> to consider</li>
+</ul>
+<pre class="r"><code>n &lt;- 500
+n_sample &lt;- 10000</code></pre>
 </div>
 <div id="computation" class="section level1">
 <h1>Computation</h1>
@@ -268,141 +273,47 @@ test_set &lt;- data_frame(x=x0)</code></pre>
 <h1>Tables</h1>
 <p>As done in Lec 2.7, for both</p>
 <ul>
-<li>An <code>lm</code> regression</li>
+<li>An <code>lm</code> regression AKA a <code>smooth.splines(x, y, df=2)</code> model fit</li>
 <li>A <code>smooth.splines(x, y, df=99)</code> model fit</li>
 </ul>
 <p>output tables comparing:</p>
-<ul>
-<li>The mean square error</li>
-<li>The breakdown of
-<ul>
-<li>Irreducible error component</li>
-<li>Bias component</li>
-<li>Variance component</li>
-</ul></li>
-<li>The sum of the breakdown above:</li>
-</ul>
-<p><span class="math display">\[
-\mbox{Var}\left[\widehat{f}(x_0)\right] +
-\left(\mbox{Bias}\left[\widehat{f}(x_0)\right]\right)^2 + \sigma^2 \approx \mbox{MSE}\left[\widehat{f}(x_0)\right]
-\]</span></p>
-<p>What I got when running my simulations for <code>n_sim = 10000</code>:</p>
-<ul>
-<li><code>lm</code>: <code>MSE = 0.105</code> and <code>sum = 0.108</code></li>
-<li><code>smooth.splines(df=99)</code>: <code>MSE = 17.839</code> and <code>sum = 17.851</code></li>
-</ul>
-<p>Please output tables using the <code>kable(digits=3)</code> function like below:</p>
-<pre class="r"><code>mtcars %&gt;% 
-  head() %&gt;% 
-  kable(digits = 3)</code></pre>
 <table>
 <thead>
 <tr class="header">
-<th></th>
-<th align="right">mpg</th>
-<th align="right">cyl</th>
-<th align="right">disp</th>
-<th align="right">hp</th>
-<th align="right">drat</th>
-<th align="right">wt</th>
-<th align="right">qsec</th>
-<th align="right">vs</th>
-<th align="right">am</th>
-<th align="right">gear</th>
-<th align="right">carb</th>
+<th align="right">MSE</th>
+<th align="right">bias_squared</th>
+<th align="right">var</th>
+<th align="right">irreducible</th>
+<th align="right">sum</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Mazda RX4</td>
-<td align="right">21.0</td>
-<td align="right">6</td>
-<td align="right">160</td>
-<td align="right">110</td>
-<td align="right">3.90</td>
-<td align="right">2.620</td>
-<td align="right">16.46</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">4</td>
-<td align="right">4</td>
-</tr>
-<tr class="even">
-<td>Mazda RX4 Wag</td>
-<td align="right">21.0</td>
-<td align="right">6</td>
-<td align="right">160</td>
-<td align="right">110</td>
-<td align="right">3.90</td>
-<td align="right">2.875</td>
-<td align="right">17.02</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">4</td>
-<td align="right">4</td>
-</tr>
-<tr class="odd">
-<td>Datsun 710</td>
-<td align="right">22.8</td>
-<td align="right">4</td>
-<td align="right">108</td>
-<td align="right">93</td>
-<td align="right">3.85</td>
-<td align="right">2.320</td>
-<td align="right">18.61</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">4</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td>Hornet 4 Drive</td>
-<td align="right">21.4</td>
-<td align="right">6</td>
-<td align="right">258</td>
-<td align="right">110</td>
-<td align="right">3.08</td>
-<td align="right">3.215</td>
-<td align="right">19.44</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td>Hornet Sportabout</td>
-<td align="right">18.7</td>
-<td align="right">8</td>
-<td align="right">360</td>
-<td align="right">175</td>
-<td align="right">3.15</td>
-<td align="right">3.440</td>
-<td align="right">17.02</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td>Valiant</td>
-<td align="right">18.1</td>
-<td align="right">6</td>
-<td align="right">225</td>
-<td align="right">105</td>
-<td align="right">2.76</td>
-<td align="right">3.460</td>
-<td align="right">20.22</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1</td>
+<td align="right">X</td>
+<td align="right">X</td>
+<td align="right">X</td>
+<td align="right">X</td>
+<td align="right">X</td>
 </tr>
 </tbody>
 </table>
+<p>where <code>sum = bias_squared + var + irreducible</code>. You can created cleanly formatted tables like the one above by piping a data frame into <code>knitr::kable(digits=4)</code>.</p>
 </div>
-<div id="overall-breakdown" class="section level1">
-<h1>Overall breakdown</h1>
-<p>In <strong>two</strong> sentences or less, give a rough sketch of what the procedure would be to get the breakdown of <span class="math display">\[\mbox{MSE}\left[\widehat{f}(x)\right]\]</span> for <em>all</em> <span class="math inline">\(x\)</span> in this example, and not just for <span class="math display">\[\mbox{MSE}\left[\widehat{f}(x_0)\right] = \mbox{MSE}\left[\widehat{f}(0.95)\right]\]</span>.</p>
+<div id="analysis" class="section level1">
+<h1>Analysis</h1>
+<p><strong>Questions</strong>:</p>
+<ol style="list-style-type: decimal">
+<li>Based on the topics covered in Lec 2.7, name one possible “sanity check” for your results. Name another if you can.</li>
+<li>In <strong>two</strong> sentences or less, give a rough sketch of what the procedure would be to get the breakdown of <span class="math display">\[\mbox{MSE}\left[\widehat{f}(x)\right]\]</span> for <em>all</em> <span class="math inline">\(x\)</span> in this example, and not just for <span class="math display">\[\mbox{MSE}\left[\widehat{f}(x_0)\right]
+= \mbox{MSE}\left[\widehat{f}(0.95)\right]\]</span>.</li>
+<li>Which of the two models would you choose for predicting the point of interest and why?</li>
+</ol>
+<p><strong>Answers</strong>:</p>
+<ol style="list-style-type: decimal">
+<li></li>
+<li></li>
+<li></li>
+</ol>
 </div>
 
 
