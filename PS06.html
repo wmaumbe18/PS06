@@ -9,7 +9,7 @@
 <meta name="generator" content="pandoc" />
 
 
-<meta name="author" content="WRITE YOUR NAME HERE" />
+<meta name="author" content="Wayne Maumbe" />
 
 <meta name="date" content="2017-10-17" />
 
@@ -216,7 +216,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">STAT/MATH 495: Problem Set 06</h1>
-<h4 class="author"><em>WRITE YOUR NAME HERE</em></h4>
+<h4 class="author"><em>Wayne Maumbe</em></h4>
 <h4 class="date"><em>2017-10-17</em></h4>
 
 </div>
@@ -264,10 +264,40 @@ test_set &lt;- data_frame(x=x0)</code></pre>
 <li>Number of samples of size <span class="math inline">\(n\)</span> to consider</li>
 </ul>
 <pre class="r"><code>n &lt;- 500
-n_sample &lt;- 10000</code></pre>
+n_sample &lt;- 10000
+biaspoints &lt;- runif(n_sample)
+errorpoints &lt;- runif(n_sample)
+fitted&lt;-runif(n_sample)
+biaspoints1 &lt;- runif(n_sample)
+errorpoints1 &lt;- runif(n_sample)
+fitted1&lt;-runif(n_sample)
+premse&lt;-runif(n_sample)
+premse1&lt;-runif(n_sample)</code></pre>
 </div>
 <div id="computation" class="section level1">
 <h1>Computation</h1>
+<pre class="r"><code>for (j in 1:n_sample) { #for each model
+  current_sample_at_j &lt;-generate_sample(f,n,sigma)
+  out&lt;-lm(y~x,current_sample_at_j) %&gt;% 
+    predict(test_set) 
+  fitted[j]&lt;-out #points on blue line
+  out1&lt;-smooth.spline(x=current_sample_at_j$x,y=current_sample_at_j$y, df=99) %&gt;% 
+    predict(test_set)
+  fitted1[j]&lt;-out1$y[[1]]#points on blue line
+  }
+ 
+actual&lt;-rep(f(0.95),n_sample)
+y&lt;-rep(f(0.95),n_sample)+rnorm(n_sample,0,sigma)
+biaslm&lt;-mean(actual-fitted)
+biassm&lt;-mean(actual-fitted1)
+varfittedlm&lt;-var(fitted)
+varfittedsm&lt;-var(fitted1)
+varerrorlm&lt;-var(y)
+varerrorsm&lt;-var(y)
+mselm&lt;-mean((y-fitted)^2)
+msesm&lt;-mean((y-fitted1)^2)
+sumlm&lt;-biaslm^2+varerrorlm+varfittedlm
+sumsm&lt;-biassm^2+varerrorsm+varfittedsm</code></pre>
 </div>
 <div id="tables" class="section level1">
 <h1>Tables</h1>
@@ -280,6 +310,7 @@ n_sample &lt;- 10000</code></pre>
 <table>
 <thead>
 <tr class="header">
+<th align="right">Model</th>
 <th align="right">MSE</th>
 <th align="right">bias_squared</th>
 <th align="right">var</th>
@@ -289,11 +320,20 @@ n_sample &lt;- 10000</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">X</td>
-<td align="right">X</td>
-<td align="right">X</td>
-<td align="right">X</td>
-<td align="right">X</td>
+<td align="right">df=2</td>
+<td align="right">0.1045978</td>
+<td align="right">0.1194347</td>
+<td align="right">6.862774910^{-4}</td>
+<td align="right">0.0885144</td>
+<td align="right">0.1034653</td>
+</tr>
+<tr class="even">
+<td align="right">df=99</td>
+<td align="right">0.1054699</td>
+<td align="right">9.914420310^{-4}</td>
+<td align="right">0.0180789</td>
+<td align="right">0.0885144</td>
+<td align="right">0.1065943</td>
 </tr>
 </tbody>
 </table>
@@ -310,9 +350,9 @@ n_sample &lt;- 10000</code></pre>
 </ol>
 <p><strong>Answers</strong>:</p>
 <ol style="list-style-type: decimal">
-<li></li>
-<li></li>
-<li></li>
+<li>A possible sanity check is to calculate the <span class="math inline">\(\mbox{MSE}\left[\widehat{f}(0.95)\right]\)</span> and compare it to <code>sum = bias_squared + var + irreducible</code></li>
+<li>At the core of this procedure is the procedure above. The difference is that you perform this over all possible values of x by nesting the above for loop to iterate over all values of x.</li>
+<li>I would use the splines model because though variable its model fits contain the true value.</li>
 </ol>
 </div>
 

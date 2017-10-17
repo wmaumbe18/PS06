@@ -1,6 +1,6 @@
 ---
 title: "STAT/MATH 495: Problem Set 06"
-author: "WRITE YOUR NAME HERE"
+author: "Wayne Maumbe"
 date: "2017-10-17"
 output:
   html_document:
@@ -23,18 +23,9 @@ library(tidyverse)
 library(broom)
 library(knitr)
 ```
-
-
-
-
-
 # Collaboration
 
 Please indicate who you collaborated with on this assignment: 
-
-
-
-
 
 # Setup
 
@@ -90,15 +81,46 @@ $n=100$ to keep plots uncrowded. Here we boost to $n=500$
 ```{r}
 n <- 500
 n_sample <- 10000
+biaspoints <- runif(n_sample)
+errorpoints <- runif(n_sample)
+fitted<-runif(n_sample)
+biaspoints1 <- runif(n_sample)
+errorpoints1 <- runif(n_sample)
+fitted1<-runif(n_sample)
+premse<-runif(n_sample)
+premse1<-runif(n_sample)
 ```
 
 
 # Computation
 
-```{r}
+```{r warning=FALSE}
+
+for (j in 1:n_sample) { #for each model
+  current_sample_at_j <-generate_sample(f,n,sigma)
+  out<-lm(y~x,current_sample_at_j) %>% 
+    predict(test_set) 
+  fitted[j]<-out #points on blue line
+  out1<-smooth.spline(x=current_sample_at_j$x,y=current_sample_at_j$y, df=99) %>% 
+    predict(test_set)
+  fitted1[j]<-out1$y[[1]]#points on blue line
+  }
+ 
+actual<-rep(f(0.95),n_sample)
+y<-rep(f(0.95),n_sample)+rnorm(n_sample,0,sigma)
+biaslm<-mean(actual-fitted)
+biassm<-mean(actual-fitted1)
+varfittedlm<-var(fitted)
+varfittedsm<-var(fitted1)
+varerrorlm<-var(y)
+varerrorsm<-var(y)
+mselm<-mean((y-fitted)^2)
+msesm<-mean((y-fitted1)^2)
+sumlm<-biaslm^2+varerrorlm+varfittedlm
+sumsm<-biassm^2+varerrorsm+varfittedsm
+
 
 ```
-
 
 # Tables
 
@@ -109,9 +131,10 @@ As done in Lec 2.7, for both
 
 output tables comparing:
 
-|  MSE| bias_squared|   var| irreducible|   sum|
-|----:|------------:|-----:|-----------:|-----:|
-|     X|           X  |     X |      X |         X |
+|Model|  MSE| bias_squared|   var| irreducible|   sum|
+|---:|----:|------------:|-----:|-----------:|-----:|
+|df=2|     `r mselm`|`r biaslm` |  `r varfittedlm` |    `r varerrorlm`|         `r sumlm` |
+|df=99|    `r msesm`|  `r biassm`  |    `r varfittedsm` |     `r varerrorsm` |         `r sumsm` |
 
 where `sum = bias_squared + var + irreducible`. You can created cleanly formatted tables like the one above by piping a data frame into `knitr::kable(digits=4)`.
 
@@ -123,14 +146,16 @@ where `sum = bias_squared + var + irreducible`. You can created cleanly formatte
 **Questions**:
 
 1. Based on the topics covered in Lec 2.7, name one possible "sanity check" for your results. Name another if you can.
-1. In **two** sentences or less, give a rough sketch of what the procedure would
+2. In **two** sentences or less, give a rough sketch of what the procedure would
 be to get the breakdown of $$\mbox{MSE}\left[\widehat{f}(x)\right]$$ for *all*
 $x$ in this example, and not just for $$\mbox{MSE}\left[\widehat{f}(x_0)\right]
 = \mbox{MSE}\left[\widehat{f}(0.95)\right]$$.
-1. Which of the two models would you choose for predicting the point of interest and why?
+3. Which of the two models would you choose for predicting the point of interest and why?
 
 **Answers**:
 
-1.
-1.
-1.
+1. A possible sanity check is to calculate the $\mbox{MSE}\left[\widehat{f}(0.95)\right]$ and compare it to  `sum = bias_squared + var + irreducible`
+2. At the core of this procedure is the procedure above. The difference is that you perform this over all possible values of x by nesting the above for loop to iterate over all values of x.
+3. I would use the splines model because though variable its model fits contain the true value. 
+
+
