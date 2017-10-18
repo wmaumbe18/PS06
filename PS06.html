@@ -280,24 +280,26 @@ premse1&lt;-runif(n_sample)</code></pre>
   current_sample_at_j &lt;-generate_sample(f,n,sigma)
   out&lt;-lm(y~x,current_sample_at_j) %&gt;% 
     predict(test_set) 
-  fitted[j]&lt;-out #points on blue line
+  fitted[j]&lt;-out #points on blue line ie predicted
   out1&lt;-smooth.spline(x=current_sample_at_j$x,y=current_sample_at_j$y, df=99) %&gt;% 
     predict(test_set)
-  fitted1[j]&lt;-out1$y[[1]]#points on blue line
+  fitted1[j]&lt;-out1$y[[1]]#points on blue line ie predicted 
   }
  
-actual&lt;-rep(f(0.95),n_sample)
-y&lt;-rep(f(0.95),n_sample)+rnorm(n_sample,0,sigma)
-biaslm&lt;-mean(actual-fitted)
-biassm&lt;-mean(actual-fitted1)
-varfittedlm&lt;-var(fitted)
-varfittedsm&lt;-var(fitted1)
-varerrorlm&lt;-var(y)
-varerrorsm&lt;-var(y)
-mselm&lt;-mean((y-fitted)^2)
-msesm&lt;-mean((y-fitted1)^2)
-sumlm&lt;-biaslm^2+varerrorlm+varfittedlm
-sumsm&lt;-biassm^2+varerrorsm+varfittedsm</code></pre>
+actual&lt;-rep(f(0.95),n_sample) #red dot ie population
+y&lt;-rep(f(0.95),n_sample)+rnorm(n_sample,0,sigma)# black dot ie sample
+biaslm&lt;-round((mean(actual-fitted))^2,6)
+biassm&lt;-round((mean(actual-fitted1))^2,6)
+varfittedlm&lt;-round(var(fitted),6)
+varfittedsm&lt;-round(var(fitted1),6)
+varerrorlm&lt;-round(var(y),6)
+varerrorsm&lt;-round(var(y),6)
+mselm&lt;-round(mean((y-fitted)^2),6) #estimate mse
+msesm&lt;-round(mean((y-fitted1)^2),6)#estimate mse
+amselm&lt;-round(mean((actual-fitted)^2),6)#mse
+amsesm&lt;-round(mean((actual-fitted1)^2),6)#mse
+sumlm&lt;-round(biaslm+varerrorlm+varfittedlm,6)
+sumsm&lt;-round(biassm+varerrorsm+varfittedsm,6)</code></pre>
 </div>
 <div id="tables" class="section level1">
 <h1>Tables</h1>
@@ -311,6 +313,7 @@ sumsm&lt;-biassm^2+varerrorsm+varfittedsm</code></pre>
 <thead>
 <tr class="header">
 <th align="right">Model</th>
+<th align="right">MSE_hat</th>
 <th align="right">MSE</th>
 <th align="right">bias_squared</th>
 <th align="right">var</th>
@@ -321,19 +324,21 @@ sumsm&lt;-biassm^2+varerrorsm+varfittedsm</code></pre>
 <tbody>
 <tr class="odd">
 <td align="right">df=2</td>
-<td align="right">0.1045978</td>
-<td align="right">0.1194347</td>
-<td align="right">6.862774910^{-4}</td>
-<td align="right">0.0885144</td>
-<td align="right">0.1034653</td>
+<td align="right">0.104598</td>
+<td align="right">0.014951</td>
+<td align="right">0.014265</td>
+<td align="right">6.8610^{-4}</td>
+<td align="right">0.088514</td>
+<td align="right">0.103465</td>
 </tr>
 <tr class="even">
 <td align="right">df=99</td>
-<td align="right">0.1054699</td>
-<td align="right">9.914420310^{-4}</td>
-<td align="right">0.0180789</td>
-<td align="right">0.0885144</td>
-<td align="right">0.1065943</td>
+<td align="right">0.10547</td>
+<td align="right">0.018078</td>
+<td align="right">10^{-6}</td>
+<td align="right">0.018079</td>
+<td align="right">0.088514</td>
+<td align="right">0.106594</td>
 </tr>
 </tbody>
 </table>

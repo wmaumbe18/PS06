@@ -100,26 +100,26 @@ for (j in 1:n_sample) { #for each model
   current_sample_at_j <-generate_sample(f,n,sigma)
   out<-lm(y~x,current_sample_at_j) %>% 
     predict(test_set) 
-  fitted[j]<-out #points on blue line
+  fitted[j]<-out #points on blue line ie predicted
   out1<-smooth.spline(x=current_sample_at_j$x,y=current_sample_at_j$y, df=99) %>% 
     predict(test_set)
-  fitted1[j]<-out1$y[[1]]#points on blue line
+  fitted1[j]<-out1$y[[1]]#points on blue line ie predicted 
   }
  
-actual<-rep(f(0.95),n_sample)
-y<-rep(f(0.95),n_sample)+rnorm(n_sample,0,sigma)
-biaslm<-mean(actual-fitted)
-biassm<-mean(actual-fitted1)
-varfittedlm<-var(fitted)
-varfittedsm<-var(fitted1)
-varerrorlm<-var(y)
-varerrorsm<-var(y)
-mselm<-mean((y-fitted)^2)
-msesm<-mean((y-fitted1)^2)
-sumlm<-biaslm^2+varerrorlm+varfittedlm
-sumsm<-biassm^2+varerrorsm+varfittedsm
-
-
+actual<-rep(f(0.95),n_sample) #red dot ie population
+y<-rep(f(0.95),n_sample)+rnorm(n_sample,0,sigma)# black dot ie sample
+biaslm<-round((mean(actual-fitted))^2,6)
+biassm<-round((mean(actual-fitted1))^2,6)
+varfittedlm<-round(var(fitted),6)
+varfittedsm<-round(var(fitted1),6)
+varerrorlm<-round(var(y),6)
+varerrorsm<-round(var(y),6)
+mselm<-round(mean((y-fitted)^2),6) #estimate mse
+msesm<-round(mean((y-fitted1)^2),6)#estimate mse
+amselm<-round(mean((actual-fitted)^2),6)#mse
+amsesm<-round(mean((actual-fitted1)^2),6)#mse
+sumlm<-round(biaslm+varerrorlm+varfittedlm,6)
+sumsm<-round(biassm+varerrorsm+varfittedsm,6)
 ```
 
 # Tables
@@ -131,10 +131,10 @@ As done in Lec 2.7, for both
 
 output tables comparing:
 
-|Model|  MSE| bias_squared|   var| irreducible|   sum|
-|---:|----:|------------:|-----:|-----------:|-----:|
-|df=2|     `r mselm`|`r biaslm` |  `r varfittedlm` |    `r varerrorlm`|         `r sumlm` |
-|df=99|    `r msesm`|  `r biassm`  |    `r varfittedsm` |     `r varerrorsm` |         `r sumsm` |
+|Model|  MSE_hat| MSE| bias_squared|   var| irreducible|   sum|
+|----:|--------:|----:|------------:|-----:|-----------:|-----:|
+|df=2|     `r mselm`|`r amselm` |`r biaslm` |  `r varfittedlm` |    `r varerrorlm`|         `r sumlm` |
+|df=99|    `r msesm`| `r amsesm` | `r biassm`  |    `r varfittedsm` |     `r varerrorsm` |         `r sumsm` |
 
 where `sum = bias_squared + var + irreducible`. You can created cleanly formatted tables like the one above by piping a data frame into `knitr::kable(digits=4)`.
 
