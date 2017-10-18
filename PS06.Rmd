@@ -116,8 +116,7 @@ varerrorlm<-round(var(y),6)
 varerrorsm<-round(var(y),6)
 mselm<-round(mean((y-fitted)^2),6) #estimate mse
 msesm<-round(mean((y-fitted1)^2),6)#estimate mse
-amselm<-round(mean((actual-fitted)^2),6)#mse
-amsesm<-round(mean((actual-fitted1)^2),6)#mse
+
 sumlm<-round(biaslm+varerrorlm+varfittedlm,6)
 sumsm<-round(biassm+varerrorsm+varfittedsm,6)
 ```
@@ -131,10 +130,10 @@ As done in Lec 2.7, for both
 
 output tables comparing:
 
-|Model|  MSE_hat| MSE| bias_squared|   var| irreducible|   sum|
-|----:|--------:|----:|------------:|-----:|-----------:|-----:|
-|df=2|     `r mselm`|`r amselm` |`r biaslm` |  `r varfittedlm` |    `r varerrorlm`|         `r sumlm` |
-|df=99|    `r msesm`| `r amsesm` | `r biassm`  |    `r varfittedsm` |     `r varerrorsm` |         `r sumsm` |
+|Model|  MSE| bias_squared|   var| irreducible|   sum|
+|----:|----:|------------:|-----:|-----------:|-----:|
+|df=2|     `r mselm`|`r biaslm` |  `r varfittedlm` |    `r varerrorlm`|         `r sumlm` |
+|df=99|    `r msesm`|  `r biassm`  |    `r varfittedsm` |     `r varerrorsm` |         `r sumsm` |
 
 where `sum = bias_squared + var + irreducible`. You can created cleanly formatted tables like the one above by piping a data frame into `knitr::kable(digits=4)`.
 

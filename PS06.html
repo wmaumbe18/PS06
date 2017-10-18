@@ -296,8 +296,7 @@ varerrorlm&lt;-round(var(y),6)
 varerrorsm&lt;-round(var(y),6)
 mselm&lt;-round(mean((y-fitted)^2),6) #estimate mse
 msesm&lt;-round(mean((y-fitted1)^2),6)#estimate mse
-amselm&lt;-round(mean((actual-fitted)^2),6)#mse
-amsesm&lt;-round(mean((actual-fitted1)^2),6)#mse
+
 sumlm&lt;-round(biaslm+varerrorlm+varfittedlm,6)
 sumsm&lt;-round(biassm+varerrorsm+varfittedsm,6)</code></pre>
 </div>
@@ -313,7 +312,6 @@ sumsm&lt;-round(biassm+varerrorsm+varfittedsm,6)</code></pre>
 <thead>
 <tr class="header">
 <th align="right">Model</th>
-<th align="right">MSE_hat</th>
 <th align="right">MSE</th>
 <th align="right">bias_squared</th>
 <th align="right">var</th>
@@ -325,7 +323,6 @@ sumsm&lt;-round(biassm+varerrorsm+varfittedsm,6)</code></pre>
 <tr class="odd">
 <td align="right">df=2</td>
 <td align="right">0.104598</td>
-<td align="right">0.014951</td>
 <td align="right">0.014265</td>
 <td align="right">6.8610^{-4}</td>
 <td align="right">0.088514</td>
@@ -334,7 +331,6 @@ sumsm&lt;-round(biassm+varerrorsm+varfittedsm,6)</code></pre>
 <tr class="even">
 <td align="right">df=99</td>
 <td align="right">0.10547</td>
-<td align="right">0.018078</td>
 <td align="right">10^{-6}</td>
 <td align="right">0.018079</td>
 <td align="right">0.088514</td>
